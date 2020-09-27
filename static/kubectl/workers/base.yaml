@@ -1,0 +1,36 @@
+# Example of a worker config and can be expanded based on pipeline requirements
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pl-base
+  labels:
+    app: pipelines
+spec:
+  replicas: 6
+  selector:
+    matchLabels:
+      app: pipelines
+  template:
+    metadata:
+      labels:
+        app: pipelines
+    spec:
+      containers:
+      - name: base
+        image: base:latest
+        workingDir: "/app/pipelines"
+        command: ["python"]
+        args: ["-u", "core.py"]
+        imagePullPolicy: Never
+        envFrom:
+          - configMapRef:
+              name: sources
+        env:
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+          - name: POD
+            value: |
+              job config goes here
